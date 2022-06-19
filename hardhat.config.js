@@ -114,9 +114,7 @@ module.exports = {
   networks: {
     mumbai: {
       url: process.env.ALCHEMY_URL,
-      accounts: [
-       process.env.PRIVATE_KEY
-      ],
+      accounts: [process.env.PRIVATE_KEY],
     },
   },
   gasReporter: {

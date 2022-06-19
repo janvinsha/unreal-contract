@@ -52,8 +52,6 @@ struct Collection{
     string dp;
     address owner;
     string name;
-    uint256 totalSupply;
-    uint256 noHolders;
     string description;
      string[] tags;
 }
@@ -64,8 +62,6 @@ event CollectionCreated (
     string dp,
     address owner,
     string name,
-    uint256 totalSupply,
-    uint256 noHolders,
     string description,
      string[] tags
 );
@@ -85,6 +81,20 @@ event CollectionCreated (
     }
 
     event MarketItemCreated (
+      uint256 indexed tokenId,
+      address seller,
+      address owner,
+      uint256 price,
+      bool sold,
+      string collection,
+       string name,
+       string image,
+      string category,
+      string description,
+      string[] tags
+    );
+
+        event MarketItemSale (
       uint256 indexed tokenId,
       address seller,
       address owner,
@@ -118,9 +128,8 @@ string memory dp,
 string memory name,
 string memory description,
      string[] memory tags
-) public payable{
-    require(msg.value == listingPrice, "Price must be equal to listing price");
-
+) public{
+    
    _collectionIds.increment();
       uint256 newCollectionId = _collectionIds.current();
 
@@ -130,8 +139,15 @@ string memory description,
         dp,
         msg.sender,
         name,
-        0,
-        0,
+       description,tags
+    );
+
+    emit CollectionCreated(
+        newCollectionId,
+        banner,
+        dp,
+        msg.sender,
+        name,
        description,tags
     );
       }
@@ -141,19 +157,21 @@ string memory description,
       uint currentIndex = 0;
       Collection[] memory tempCollections = new Collection[](collectionCount);
       for (uint i = 0; i < collectionCount; i++) {
+         if(bytes(collections[i + 1].name).length>0){
           uint currentId = i + 1;
           Collection memory currentCollection = tempCollections[currentId];
           tempCollections[currentIndex] = currentCollection;
           currentIndex += 1;
+         }
       }
       return tempCollections;
     }
-     function fetchCollectionsOfAddress() public view returns (Collection[] memory) {
+     function fetchCollectionsOfAddress(address tempAddress) public view returns (Collection[] memory) {
       uint collectionCount = _collectionIds.current();
       uint currentIndex = 0;
       Collection[] memory tempCollections = new Collection[](collectionCount);
       for (uint i = 0; i < collectionCount; i++) {
-          if(collections[i + 1].owner == msg.sender){
+          if(collections[i + 1].owner == tempAddress){
           uint currentId = i + 1;
           Collection memory currentCollection = tempCollections[currentId];
           tempCollections[currentIndex] = currentCollection;
@@ -307,6 +325,21 @@ function getProfile(address id) public view returns(Profile memory){
       _transfer(address(this), msg.sender, tokenId);
       payable(owner).transfer(listingPrice);
       payable(seller).transfer(msg.value);
+
+    
+      emit MarketItemSale(
+             tokenId,
+      idToMarketItem[tokenId].seller,
+       idToMarketItem[tokenId].owner,
+        idToMarketItem[tokenId].price,
+        idToMarketItem[tokenId].sold,
+      idToMarketItem[tokenId].collection,
+        idToMarketItem[tokenId].name,
+         idToMarketItem[tokenId].image,
+      idToMarketItem[tokenId].category,
+      idToMarketItem[tokenId].description,
+     idToMarketItem[tokenId].tags
+      );
     }
 
     /* Returns all unsold market items */

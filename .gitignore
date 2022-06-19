@@ -7,3 +7,6 @@ typechain
 #Hardhat files
 cache
 artifacts
+unreal-contract-v2
+unreal-graph-v3
+unreal-graph-v4
